@@ -1,0 +1,62 @@
+{
+  "features": {
+    "feature": [
+      {
+        "Airspace": {
+          "id": "1",
+          "type": "FIR",
+          "name": "Big Fir",
+          "geometry": {
+            "points": {
+              "lat_lon": [
+                "55.234 78.456",
+                "57.345 87.2434",
+                "59.235 79.757"
+              ]
+            }
+          },
+          "annotation": "Some plain text"
+        }
+      },
+      {
+        "Airspace": {
+          "id": "2",
+          "type": "DANGER",
+          "name": "Missile launch",
+          "geometry": {
+            "points": {
+              "lat_lon": [
+                "32.234 65.77",
+                "32.534 54.355",
+                "13.23 54.4"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "Airport": {
+          "id": "3",
+          "city": "Moscow",
+          "arp": { "lat_lon": "55 55" },
+          "annotation": "Sheremetyevo Airport"
+        }
+      },
+      {
+        "Route": {
+          "id": "4",
+          "line": {
+            "points": {
+              "lat_lon": [
+                "55 78",
+                "56 98",
+                "57 90"
+              ]
+            }
+          },
+          "direction": "BOTH"
+        }
+      }
+    ]
+  }
+}

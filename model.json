@@ -1,0 +1,74 @@
+{
+	"types": [
+		"integer",
+		"text",
+		"lat_lon",
+		"lat_lon_list",
+		"EnumAirspaceType",
+		"EnumRouteDirection"
+	],
+	"enumerations": [{
+		"name": "EnumAirspaceType",
+		"values": [ 
+			"FIR", 
+			"CTA", 
+			"DANGER"
+		]
+	}, {
+		"name": "EnumRouteDirection",
+		"values": [
+			"FWD",
+			"BCKWD",
+			"BOTH"
+		]
+	}],
+	"classes": [{
+		"name": "Airspace",
+		"properties": [{
+			"name": "id",
+			"type": "integer"
+		}, {
+			"name": "type",
+			"type": "EnumAirspaceType"
+		}, {
+			"name": "name",
+		    "type": "text"
+		}, {
+			"name": "geometry",
+			"type": "lat_lon_list"
+		}, {
+			"name": "annotation",
+			"type": "text"
+		}]
+	}, {
+		"name": "Airport",
+		"properties": [{
+			"name": "id",
+			"type": "integer"
+		}, {
+			"name": "city",
+			"type": "text"
+		}, {
+			"name": "arp",
+		    "type": "lat_lon"
+		}, {
+			"name": "annotation",
+			"type": "text"
+		}]
+	}, {
+		"name": "Route",
+		"properties": [{
+			"name": "id",
+			"type": "integer"
+		}, {
+			"name": "line",
+			"type": "lat_lon_list"
+		}, {
+			"name": "direction",
+			"type": "EnumRouteDirection"
+		}, {
+			"name": "annotation",
+			"type": "text"
+		}]
+	}]
+}
