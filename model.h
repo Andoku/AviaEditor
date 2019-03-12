@@ -7,7 +7,7 @@ class Model : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    Model(int rows, int cols, QObject *parent = nullptr);
+    Model(QString name, const QMap<QString, QString> &properties, QObject *parent = nullptr);
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
@@ -15,10 +15,12 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
+    void addData(const QMap<QString, QString> &newData);
 private:
-    int cols;
-    int rows;
+    QString name;
     QVector<QVector<QString> > m_gridData;
+    QMap<QString, QString> properties;
+    QVector<QMap<QString, QString> > objectsData;
 };
 
 #endif // MODEL_H
