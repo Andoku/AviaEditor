@@ -32,7 +32,7 @@ private:
     QString objectsFilename;
 
     QMap<QString, Model *> models;
-    QMap<QString, QStringListModel *> typeModels;
+    QMap<QString, QStringListModel *> enumModels;
     QString currentModel;
 
     QDataWidgetMapper *mapper;

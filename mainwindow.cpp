@@ -30,6 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->classType->setVisible(false);
     ui->previousButton->setVisible(false);
     ui->nextButton->setVisible(false);
+    ui->typeLabel->setVisible(false);
 }
 
 MainWindow::~MainWindow()
@@ -91,6 +92,7 @@ void MainWindow::openObjects()
     const QJsonDocument objectsDoc(QJsonDocument::fromJson(objectsData));
     setupModel(modelDoc.object(), objectsDoc.object());
 
+    ui->typeLabel->setVisible(true);
     ui->classType->setVisible(true);
 }
 
@@ -104,11 +106,13 @@ void MainWindow::changeActiveModel(QString name)
         QString labelName = models[name]->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString();
         QLabel *nameLabel = new QLabel(labelName + ":");
         ui->layout->addWidget(nameLabel, i, 0, Qt::AlignTop);
-        if(typeModels.count(models[name]->getType(i))) {
+
+        if(enumModels.count(models[name]->getType(i))) {
             QComboBox *typeComboBox = new QComboBox();
-            typeComboBox->setModel(typeModels[models[name]->getType(i)]);
+            typeComboBox->setModel(enumModels[models[name]->getType(i)]);
             ui->layout->addWidget(typeComboBox, i, 1, Qt::AlignTop);
-            mapper->addMapping(typeComboBox, i, "currentIndex");
+            mapper->addMapping(typeComboBox, i);
+            //connect(typeComboBox, SIGNAL(currentIndexChanged(int)), mapper, SLOT(setCurrentIndex(int)));
         } else {
             QLineEdit *nameEdit = new QLineEdit();
             ui->layout->addWidget(nameEdit, i, 1, Qt::AlignTop);
@@ -141,7 +145,7 @@ void MainWindow::setupTypesModel(const QJsonObject &model)
         if(typesArray[i].isString()){
             const QString typeName = typesArray[i].toString();
             if(enumerations.count(typeName)) {
-                typeModels[typeName] = new QStringListModel(enumerations[typeName], this);
+                enumModels[typeName] = new QStringListModel(enumerations[typeName], this);
             }
         }
     }

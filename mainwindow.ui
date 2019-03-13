@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>441</width>
+    <width>461</width>
     <height>399</height>
    </rect>
   </property>
@@ -19,7 +19,7 @@
      <rect>
       <x>140</x>
       <y>10</y>
-      <width>271</width>
+      <width>291</width>
       <height>31</height>
      </rect>
     </property>
@@ -32,7 +32,7 @@
      <rect>
       <x>140</x>
       <y>50</y>
-      <width>271</width>
+      <width>291</width>
       <height>31</height>
      </rect>
     </property>
@@ -80,7 +80,7 @@
    <widget class="QComboBox" name="classType">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>90</x>
       <y>120</y>
       <width>111</width>
       <height>31</height>
@@ -93,7 +93,7 @@
       <x>20</x>
       <y>10</y>
       <width>111</width>
-      <height>27</height>
+      <height>41</height>
      </rect>
     </property>
     <property name="text">
@@ -106,11 +106,24 @@
       <x>20</x>
       <y>50</y>
       <width>111</width>
-      <height>27</height>
+      <height>41</height>
      </rect>
     </property>
     <property name="text">
      <string>Open Objects</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="typeLabel">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>120</y>
+      <width>41</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Type:</string>
     </property>
    </widget>
   </widget>
@@ -120,8 +133,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>441</width>
-     <height>25</height>
+     <width>461</width>
+     <height>22</height>
     </rect>
    </property>
   </widget>
