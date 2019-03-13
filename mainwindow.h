@@ -3,11 +3,7 @@
 
 #include <QMainWindow>
 #include <QJsonObject>
-
 #include <QDataWidgetMapper>
-#include <QLabel>
-#include <QLineEdit>
-#include <QLayout>
 
 #include "model.h"
 
@@ -27,6 +23,7 @@ private slots:
     void openModel();
     void openObjects();
     void changeModel(QString name);
+    void updateButtons(int row);
 
 private:
     Ui::MainWindow *ui;
@@ -34,7 +31,7 @@ private:
     QString objectsFilename;
 
     QMap<QString, Model *> models;
-    QMap<QString, QGridLayout *> layouts;
+    QString currentModel;
 
     QDataWidgetMapper *mapper;
 

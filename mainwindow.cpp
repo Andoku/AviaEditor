@@ -19,6 +19,16 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->classType, SIGNAL(currentIndexChanged(QString)), this, SLOT(changeModel(QString)));
 
     mapper = new QDataWidgetMapper(this);
+    connect(ui->previousButton, &QAbstractButton::clicked, mapper, &QDataWidgetMapper::toPrevious);
+    connect(ui->nextButton, &QAbstractButton::clicked, mapper, &QDataWidgetMapper::toNext);
+    connect(mapper, &QDataWidgetMapper::currentIndexChanged, this, &MainWindow::updateButtons);
+
+    ui->openObjectsButton->setVisible(false);
+    ui->objectsFile->setVisible(false);
+    ui->classType->setVisible(false);
+    ui->classLabel->setVisible(false);
+    ui->previousButton->setVisible(false);
+    ui->nextButton->setVisible(false);
 }
 
 MainWindow::~MainWindow()
@@ -26,10 +36,16 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::updateButtons(int row)
+{
+    ui->previousButton->setEnabled(row > 0);
+    ui->nextButton->setEnabled(row < models[currentModel]->rowCount() - 1);
+}
+
 void MainWindow::clearLayout(QLayout *layout)
 {
     QLayoutItem *item;
-    while((item = ui->layout->takeAt(0))) {
+    while((item = layout->takeAt(0))) {
         if (item->layout()) {
             clearLayout(item->layout());
             delete item->layout();
@@ -45,7 +61,11 @@ void MainWindow::openModel()
 {
     modelFilename = QFileDialog::getOpenFileName(this,
         "Select a file to open...", QDir::homePath(), "Model File (*.json)");
-    ui->modelFile->setText(modelFilename);
+    if(!modelFilename.isEmpty()) {
+        ui->modelFile->setText(modelFilename);
+        ui->openObjectsButton->setVisible(true);
+        ui->objectsFile->setVisible(true);
+    }
 }
 
 void MainWindow::openObjects()
@@ -69,11 +89,14 @@ void MainWindow::openObjects()
     const QJsonDocument modelDoc(QJsonDocument::fromJson(modelData));
     const QJsonDocument objectsDoc(QJsonDocument::fromJson(objectsData));
     setupModel(modelDoc.object(), objectsDoc.object());
+
+    ui->classType->setVisible(true);
+    ui->classLabel->setVisible(true);
 }
 
 void MainWindow::changeModel(QString name)
 {
-    ui->tableView->setModel(models[name]);
+    currentModel = name;
     mapper->setModel(models[name]);
     clearLayout(ui->layout);
 
@@ -81,12 +104,14 @@ void MainWindow::changeModel(QString name)
         QString labelName = models[name]->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString();
         QLabel *nameLabel = new QLabel(labelName + ":");
         QLineEdit *nameEdit = new QLineEdit();
-        nameLabel->setBuddy(nameEdit);
-        ui->layout->addWidget(nameLabel, i, 0, 1, 1);
-        ui->layout->addWidget(nameEdit, i, 1, 1, 1);
+
+        ui->layout->addWidget(nameLabel, i, 0, Qt::AlignTop);
+        ui->layout->addWidget(nameEdit, i, 1, Qt::AlignTop);
         mapper->addMapping(nameEdit, i);
     }
 
+    ui->previousButton->setVisible(models[name]->rowCount() > 1);
+    ui->nextButton->setVisible(models[name]->rowCount() > 1);
     mapper->toFirst();
 }
 
