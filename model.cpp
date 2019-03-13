@@ -1,8 +1,7 @@
 #include "model.h"
 
-Model::Model(QString name, const QMap<QString, QString> &properties, QObject *parent)
+Model::Model(const QMap<QString, QString> &properties, QObject *parent)
     : QAbstractTableModel(parent),
-      name(name),
       properties(properties)
 {}
 
@@ -18,7 +17,7 @@ int Model::columnCount(const QModelIndex & /*parent*/) const
 
 QVariant Model::data(const QModelIndex &index, int role) const
 {
-    if (role == Qt::DisplayRole) {
+    if (role == Qt::DisplayRole || role == Qt::EditRole) {
         return objectsData[index.row()][(properties.begin() + index.column()).key()];
     }
 

@@ -2,6 +2,10 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 
+#include <QTextEdit>
+#include <QSpinBox>
+#include <QPushButton>
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -13,11 +17,28 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->openModelButton, SIGNAL(released()), this, SLOT(openModel()));
     connect(ui->openObjectsButton, SIGNAL(released()), this, SLOT(openObjects()));
     connect(ui->classType, SIGNAL(currentIndexChanged(QString)), this, SLOT(changeModel(QString)));
+
+    mapper = new QDataWidgetMapper(this);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::clearLayout(QLayout *layout)
+{
+    QLayoutItem *item;
+    while((item = ui->layout->takeAt(0))) {
+        if (item->layout()) {
+            clearLayout(item->layout());
+            delete item->layout();
+        }
+        if (item->widget()) {
+            delete item->widget();
+        }
+        delete item;
+    }
 }
 
 void MainWindow::openModel()
@@ -53,6 +74,20 @@ void MainWindow::openObjects()
 void MainWindow::changeModel(QString name)
 {
     ui->tableView->setModel(models[name]);
+    mapper->setModel(models[name]);
+    clearLayout(ui->layout);
+
+    for(int i = 0; i < models[name]->columnCount(); ++i) {
+        QString labelName = models[name]->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString();
+        QLabel *nameLabel = new QLabel(labelName + ":");
+        QLineEdit *nameEdit = new QLineEdit();
+        nameLabel->setBuddy(nameEdit);
+        ui->layout->addWidget(nameLabel, i, 0, 1, 1);
+        ui->layout->addWidget(nameEdit, i, 1, 1, 1);
+        mapper->addMapping(nameEdit, i);
+    }
+
+    mapper->toFirst();
 }
 
 void MainWindow::setupModel(const QJsonObject &model, const QJsonObject &objects)
@@ -82,7 +117,7 @@ void MainWindow::setupModel(const QJsonObject &model, const QJsonObject &objects
             }
         }
         const QString className = classesObject["name"].toString();
-        models[className] = new Model(className, properties);
+        models[className] = new Model(properties);
         ui->classType->addItem(className);
     }
 
