@@ -51,3 +51,8 @@ void Model::addData(const QMap<QString, QString> &newData)
 {
     objectsData.append(newData);
 }
+
+QString Model::getType(int column) const
+{
+    return (properties.begin() + column).value();
+}
