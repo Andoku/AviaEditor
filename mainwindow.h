@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QJsonObject>
 #include <QDataWidgetMapper>
+#include <QStringListModel>
 
 #include "model.h"
 
@@ -22,7 +23,7 @@ public:
 private slots:
     void openModel();
     void openObjects();
-    void changeModel(QString name);
+    void changeActiveModel(QString name);
     void updateButtons(int row);
 
 private:
@@ -31,11 +32,13 @@ private:
     QString objectsFilename;
 
     QMap<QString, Model *> models;
+    QMap<QString, QStringListModel *> typeModels;
     QString currentModel;
 
     QDataWidgetMapper *mapper;
 
     void setupModel(const QJsonObject &model, const QJsonObject &objects);
+    void setupTypesModel(const QJsonObject &model);
     void clearLayout(QLayout *layout);
 };
 

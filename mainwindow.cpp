@@ -1,6 +1,8 @@
 #include <QFileDialog>
 #include <QJsonDocument>
 #include <QJsonArray>
+#include <QLabel>
+#include <QComboBox>
 
 #include <QTextEdit>
 #include <QSpinBox>
@@ -16,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     connect(ui->openModelButton, SIGNAL(released()), this, SLOT(openModel()));
     connect(ui->openObjectsButton, SIGNAL(released()), this, SLOT(openObjects()));
-    connect(ui->classType, SIGNAL(currentIndexChanged(QString)), this, SLOT(changeModel(QString)));
+    connect(ui->classType, SIGNAL(currentIndexChanged(QString)), this, SLOT(changeActiveModel(QString)));
 
     mapper = new QDataWidgetMapper(this);
     connect(ui->previousButton, &QAbstractButton::clicked, mapper, &QDataWidgetMapper::toPrevious);
@@ -26,7 +28,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->openObjectsButton->setVisible(false);
     ui->objectsFile->setVisible(false);
     ui->classType->setVisible(false);
-    ui->classLabel->setVisible(false);
     ui->previousButton->setVisible(false);
     ui->nextButton->setVisible(false);
 }
@@ -91,10 +92,9 @@ void MainWindow::openObjects()
     setupModel(modelDoc.object(), objectsDoc.object());
 
     ui->classType->setVisible(true);
-    ui->classLabel->setVisible(true);
 }
 
-void MainWindow::changeModel(QString name)
+void MainWindow::changeActiveModel(QString name)
 {
     currentModel = name;
     mapper->setModel(models[name]);
@@ -103,11 +103,17 @@ void MainWindow::changeModel(QString name)
     for(int i = 0; i < models[name]->columnCount(); ++i) {
         QString labelName = models[name]->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString();
         QLabel *nameLabel = new QLabel(labelName + ":");
-        QLineEdit *nameEdit = new QLineEdit();
-
         ui->layout->addWidget(nameLabel, i, 0, Qt::AlignTop);
-        ui->layout->addWidget(nameEdit, i, 1, Qt::AlignTop);
-        mapper->addMapping(nameEdit, i);
+        if(typeModels.count(models[name]->getType(i))) {
+            QComboBox *typeComboBox = new QComboBox();
+            typeComboBox->setModel(typeModels[models[name]->getType(i)]);
+            ui->layout->addWidget(typeComboBox, i, 1, Qt::AlignTop);
+            mapper->addMapping(typeComboBox, i, "currentIndex");
+        } else {
+            QLineEdit *nameEdit = new QLineEdit();
+            ui->layout->addWidget(nameEdit, i, 1, Qt::AlignTop);
+            mapper->addMapping(nameEdit, i);
+        }
     }
 
     ui->previousButton->setVisible(models[name]->rowCount() > 1);
@@ -115,12 +121,41 @@ void MainWindow::changeModel(QString name)
     mapper->toFirst();
 }
 
+void MainWindow::setupTypesModel(const QJsonObject &model)
+{
+    QMap<QString, QStringList> enumerations;
+    if(model.contains("enumerations") && model["enumerations"].isArray()) {
+        const QJsonArray enumerationsArray = model["enumerations"].toArray();
+        for (int i = 0; i < enumerationsArray.size(); ++i) {
+            const QJsonObject enumeration = enumerationsArray[i].toObject();
+            const QString name = enumeration["name"].toString();
+            const QJsonArray values = enumeration["values"].toArray();
+            for (int j = 0; j < values.size(); ++j) {
+                enumerations[name].append(values[j].toString());
+            }
+        }
+    }
+
+    const QJsonArray typesArray = model["types"].toArray();
+    for (int i = 0; i < typesArray.size(); ++i) {
+        if(typesArray[i].isString()){
+            const QString typeName = typesArray[i].toString();
+            if(enumerations.count(typeName)) {
+                typeModels[typeName] = new QStringListModel(enumerations[typeName], this);
+            }
+        }
+    }
+}
+
 void MainWindow::setupModel(const QJsonObject &model, const QJsonObject &objects)
 {
-    if(!model.contains("classes") || !model["classes"].isArray()) {
+    if(!model.contains("classes") || !model["classes"].isArray() ||
+            !model.contains("types") || !model["types"].isArray()) {
         qWarning("Incorrect model file");
         return;
     }
+
+    setupTypesModel(model);
 
     const QJsonArray classesArray = model["classes"].toArray();
     for (int i = 0; i < classesArray.size(); ++i) {
@@ -174,4 +209,6 @@ void MainWindow::setupModel(const QJsonObject &model, const QJsonObject &objects
         }
         models[keys[0]]->addData(data);
     }
+
+    changeActiveModel(ui->classType->currentText());
 }
