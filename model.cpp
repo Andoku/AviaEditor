@@ -56,3 +56,11 @@ QString Model::getType(int column) const
 {
     return (properties.begin() + column).value();
 }
+
+QString Model::getType(QString column) const
+{
+    if(properties.count(column)) {
+        return properties[column];
+    }
+    return QString();
+}

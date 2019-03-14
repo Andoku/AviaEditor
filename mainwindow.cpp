@@ -224,6 +224,19 @@ bool MainWindow::setupModelsObjects(const QJsonObject &objects)
         for (int i = 0; i < objectProperties.size(); ++i) {
             if(object[objectProperties[i]].isString()) {
                 data[objectProperties[i]] = object[objectProperties[i]].toString();
+            } else if(object[objectProperties[i]].isObject()) {
+                const QJsonObject property = object[objectProperties[i]].toObject();
+                if(property.contains("lat_lon") && property["lat_lon"].isString()) {
+                    data[objectProperties[i]] = property["lat_lon"].toString();
+                } else if(property.contains("points") && property["points"].isObject()) {
+                    const QJsonObject points = property["points"].toObject();
+                    if(points.contains("lat_lon") && points["lat_lon"].isArray()) {
+                        const QJsonArray pointsArray = points["lat_lon"].toArray();
+                        for (int j = 0; j < pointsArray.size(); ++j) {
+                            data[objectProperties[i]] += pointsArray[j].toString() + "; ";
+                        }
+                    }
+                }
             }
         }
         models[keys[0]]->addData(data);

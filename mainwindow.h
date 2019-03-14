@@ -28,14 +28,14 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    QDataWidgetMapper *mapper;
+
     QString modelFilename;
     QString objectsFilename;
 
     QMap<QString, Model *> models;
     QMap<QString, QStringListModel *> enumModels;
     QString currentModel;
-
-    QDataWidgetMapper *mapper;
 
     void setupModels(const QJsonObject &model, const QJsonObject &objects);
     bool setupModelsProperties(const QJsonObject &model);

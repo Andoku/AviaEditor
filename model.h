@@ -17,6 +17,7 @@ public:
 
     void addData(const QMap<QString, QString> &newData);
     QString getType(int column) const;
+    QString getType(QString column) const;
 private:
     QMap<QString, QString> properties;
     QVector<QMap<QString, QString> > objectsData;
