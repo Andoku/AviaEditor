@@ -37,8 +37,10 @@ private:
 
     QDataWidgetMapper *mapper;
 
-    void setupModel(const QJsonObject &model, const QJsonObject &objects);
-    void setupTypesModel(const QJsonObject &model);
+    void setupModels(const QJsonObject &model, const QJsonObject &objects);
+    bool setupModelsProperties(const QJsonObject &model);
+    bool setupModelsObjects(const QJsonObject &objects);
+    bool setupTypeModels(const QJsonObject &model);
     void clearLayout(QLayout *layout);
 };
 

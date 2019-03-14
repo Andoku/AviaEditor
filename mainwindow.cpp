@@ -48,11 +48,11 @@ void MainWindow::clearLayout(QLayout *layout)
 {
     QLayoutItem *item;
     while((item = layout->takeAt(0))) {
-        if (item->layout()) {
+        if(item->layout()) {
             clearLayout(item->layout());
             delete item->layout();
         }
-        if (item->widget()) {
+        if(item->widget()) {
             delete item->widget();
         }
         delete item;
@@ -90,7 +90,7 @@ void MainWindow::openObjects()
     const QByteArray objectsData = objectsFile.readAll();
     const QJsonDocument modelDoc(QJsonDocument::fromJson(modelData));
     const QJsonDocument objectsDoc(QJsonDocument::fromJson(objectsData));
-    setupModel(modelDoc.object(), objectsDoc.object());
+    setupModels(modelDoc.object(), objectsDoc.object());
 
     ui->typeLabel->setVisible(true);
     ui->classType->setVisible(true);
@@ -105,17 +105,16 @@ void MainWindow::changeActiveModel(QString name)
     for(int i = 0; i < models[name]->columnCount(); ++i) {
         QString labelName = models[name]->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString();
         QLabel *nameLabel = new QLabel(labelName + ":");
-        ui->layout->addWidget(nameLabel, i, 0, Qt::AlignTop);
+        ui->layout->addWidget(nameLabel, i, 0);
 
         if(enumModels.count(models[name]->getType(i))) {
             QComboBox *typeComboBox = new QComboBox();
             typeComboBox->setModel(enumModels[models[name]->getType(i)]);
-            ui->layout->addWidget(typeComboBox, i, 1, Qt::AlignTop);
+            ui->layout->addWidget(typeComboBox, i, 1);
             mapper->addMapping(typeComboBox, i);
-            //connect(typeComboBox, SIGNAL(currentIndexChanged(int)), mapper, SLOT(setCurrentIndex(int)));
         } else {
             QLineEdit *nameEdit = new QLineEdit();
-            ui->layout->addWidget(nameEdit, i, 1, Qt::AlignTop);
+            ui->layout->addWidget(nameEdit, i, 1);
             mapper->addMapping(nameEdit, i);
         }
     }
@@ -125,8 +124,20 @@ void MainWindow::changeActiveModel(QString name)
     mapper->toFirst();
 }
 
-void MainWindow::setupTypesModel(const QJsonObject &model)
+void MainWindow::setupModels(const QJsonObject &model, const QJsonObject &objects)
 {
+    if(setupTypeModels(model) && setupModelsProperties(model) && setupModelsObjects(objects)) {
+        changeActiveModel(ui->classType->currentText());
+    }
+}
+
+bool MainWindow::setupTypeModels(const QJsonObject &model)
+{
+    if(!model.contains("types") || !model["types"].isArray()) {
+        qWarning("Incorrect model file");
+        return false;
+    }
+
     QMap<QString, QStringList> enumerations;
     if(model.contains("enumerations") && model["enumerations"].isArray()) {
         const QJsonArray enumerationsArray = model["enumerations"].toArray();
@@ -149,17 +160,16 @@ void MainWindow::setupTypesModel(const QJsonObject &model)
             }
         }
     }
+
+    return true;
 }
 
-void MainWindow::setupModel(const QJsonObject &model, const QJsonObject &objects)
+bool MainWindow::setupModelsProperties(const QJsonObject &model)
 {
-    if(!model.contains("classes") || !model["classes"].isArray() ||
-            !model.contains("types") || !model["types"].isArray()) {
+    if(!model.contains("classes") || !model["classes"].isArray()) {
         qWarning("Incorrect model file");
-        return;
+        return false;
     }
-
-    setupTypesModel(model);
 
     const QJsonArray classesArray = model["classes"].toArray();
     for (int i = 0; i < classesArray.size(); ++i) {
@@ -185,15 +195,20 @@ void MainWindow::setupModel(const QJsonObject &model, const QJsonObject &objects
         ui->classType->addItem(className);
     }
 
+    return true;
+}
+
+bool MainWindow::setupModelsObjects(const QJsonObject &objects)
+{
     if(!objects.contains("features") || !objects["features"].isObject()) {
         qWarning("Incorrect objects file");
-        return;
+        return false;
     }
 
     const QJsonObject featuresObject = objects["features"].toObject();
     if(!featuresObject.contains("feature") || !featuresObject["feature"].isArray()) {
         qWarning("Incorrect objects file");
-        return;
+        return false;
     }
 
     const QJsonArray featureArray = featuresObject["feature"].toArray();
@@ -213,6 +228,5 @@ void MainWindow::setupModel(const QJsonObject &model, const QJsonObject &objects
         }
         models[keys[0]]->addData(data);
     }
-
-    changeActiveModel(ui->classType->currentText());
+    return true;
 }
