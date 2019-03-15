@@ -2,11 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QJsonObject>
 #include <QDataWidgetMapper>
-#include <QStringListModel>
 
 #include "model.h"
+#include "modelmanager.h"
 
 namespace Ui {
 class MainWindow;
@@ -33,14 +32,8 @@ private:
     QString modelFilename;
     QString objectsFilename;
 
-    QMap<QString, Model *> models;
-    QMap<QString, QStringListModel *> enumModels;
-    QString currentModel;
+    ModelManager modelManager;
 
-    void setupModels(const QJsonObject &model, const QJsonObject &objects);
-    bool setupModelsProperties(const QJsonObject &model);
-    bool setupModelsObjects(const QJsonObject &objects);
-    bool setupTypeModels(const QJsonObject &model);
     void clearLayout(QLayout *layout);
 };
 

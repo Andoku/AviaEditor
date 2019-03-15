@@ -27,11 +27,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    model.cpp
+    model.cpp \
+    modelmanager.cpp
 
 HEADERS += \
         mainwindow.h \
-    model.h
+    model.h \
+    modelmanager.h
 
 FORMS += \
         mainwindow.ui

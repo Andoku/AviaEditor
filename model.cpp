@@ -31,6 +31,7 @@ QVariant Model::headerData(int section, Qt::Orientation orientation, int role) c
             return (properties.begin() + section).key();
         }
     }
+
     return QVariant();
 }
 
@@ -39,6 +40,7 @@ bool Model::setData(const QModelIndex & index, const QVariant & value, int role)
     if (role == Qt::EditRole) {
         objectsData[index.row()][(properties.begin() + index.column()).key()] = value.toString();
     }
+
     return true;
 }
 
@@ -59,8 +61,5 @@ QString Model::getType(int column) const
 
 QString Model::getType(QString column) const
 {
-    if(properties.count(column)) {
-        return properties[column];
-    }
-    return QString();
+    return properties.count(column) ? properties[column] : QString();
 }
